@@ -41,11 +41,20 @@ namespace VideoRecorderScreen.Views
             InitializeComponent();
             _tcs = tcs;
 
-            _selection = new Rect(
-                initialRegion.X - SystemParameters.VirtualScreenLeft,
-                initialRegion.Y - SystemParameters.VirtualScreenTop,
-                initialRegion.Width,
-                initialRegion.Height);
+            if (initialRegion.Width >= 4 && initialRegion.Height >= 4)
+            {
+                _selection = new Rect(
+                    initialRegion.X - SystemParameters.VirtualScreenLeft,
+                    initialRegion.Y - SystemParameters.VirtualScreenTop,
+                    initialRegion.Width,
+                    initialRegion.Height);
+            }
+            else
+            {
+                double sw = SystemParameters.PrimaryScreenWidth;
+                double sh = SystemParameters.PrimaryScreenHeight;
+                _selection = new Rect(sw * 0.1, sh * 0.1, sw * 0.8, sh * 0.8);
+            }
 
             Left = SystemParameters.VirtualScreenLeft;
             Top = SystemParameters.VirtualScreenTop;

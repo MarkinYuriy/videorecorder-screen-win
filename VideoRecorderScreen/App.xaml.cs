@@ -1,4 +1,5 @@
 using System.Windows;
+using FFMpegCore;
 using VideoRecorderScreen.Services;
 
 namespace VideoRecorderScreen
@@ -12,6 +13,7 @@ namespace VideoRecorderScreen
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            GlobalFFOptions.Configure(o => o.BinaryFolder = AppDomain.CurrentDomain.BaseDirectory);
             SettingsService.Load();
             _trayService = new TrayService();
             _trayService.Initialize();
