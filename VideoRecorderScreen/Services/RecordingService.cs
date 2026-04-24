@@ -14,6 +14,7 @@ namespace VideoRecorderScreen.Services
 
         public void Start(WizardResult settings)
         {
+            AppLogger.Log($"RecordingService.Start: region={settings.Region} fps={settings.Fps}");
             IsRecording = true;
 
             _tempDir = Path.Combine(Path.GetTempPath(),
@@ -37,33 +38,22 @@ namespace VideoRecorderScreen.Services
             _screen.Start(region, settings.Fps);
         }
 
+        // Returns path to merged temp file (not yet at final destination)
         public async Task<string> StopAsync()
         {
+            AppLogger.Log("RecordingService.StopAsync: stopping capture");
             IsRecording = false;
-
             await _screen.StopAsync();
             _audio.Stop();
 
-            var finalPath = BuildOutputPath();
-            await _encoder.StopAsync(_audio.HasAudio ? _audio.TempWavPath : null, finalPath);
-
-            CleanupTemp();
-            return finalPath;
+            var tempFinal = Path.Combine(_tempDir!, "output.mp4");
+            AppLogger.Log($"RecordingService.StopAsync: encoding to {tempFinal}, hasAudio={_audio.HasAudio}");
+            await _encoder.StopAsync(_audio.HasAudio ? _audio.TempWavPath : null, tempFinal);
+            AppLogger.Log($"RecordingService.StopAsync: done, file exists={File.Exists(tempFinal)}");
+            return tempFinal;
         }
 
-        private string BuildOutputPath()
-        {
-            var s = App.SettingsService.Settings;
-            Directory.CreateDirectory(s.RecordingsFolder);
-
-            if (s.AutoFormatFilename)
-                return Path.Combine(s.RecordingsFolder,
-                    $"Recording_{DateTime.Now:yyyy-MM-dd_HH-mm}.mp4");
-
-            return Path.Combine(s.RecordingsFolder, "recording.mp4");
-        }
-
-        private void CleanupTemp()
+        public void Cleanup()
         {
             try
             {

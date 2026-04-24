@@ -12,6 +12,7 @@ namespace VideoRecorderScreen.Services
     {
         private NotifyIcon? _notifyIcon;
         private RecordingService? _recording;
+        private RecordingOverlay? _recordingOverlay;
         private ToolStripMenuItem? _itemNewRecording;
         private ToolStripMenuItem? _itemStopRecording;
 
@@ -46,14 +47,17 @@ namespace VideoRecorderScreen.Services
         private async void OnNewRecording(object? sender, EventArgs e)
         {
             if (_recording?.IsRecording == true) return;
+            AppLogger.Log("OnNewRecording: started");
 
             try
             {
                 var s = App.SettingsService.Settings;
                 var initial = new Rect(s.RegionX, s.RegionY, s.RegionWidth, s.RegionHeight);
+                AppLogger.Log($"OnNewRecording: opening overlay, initial region={initial}");
 
                 var region = await OverlayWindow.ShowAsync(initial);
-                if (region is null) return;
+                if (region is null) { AppLogger.Log("OnNewRecording: overlay cancelled"); return; }
+                AppLogger.Log($"OnNewRecording: region selected={region}");
 
                 s.RegionX = (int)region.Value.X;
                 s.RegionY = (int)region.Value.Y;
@@ -61,20 +65,24 @@ namespace VideoRecorderScreen.Services
                 s.RegionHeight = (int)region.Value.Height;
 
                 var result = await WizardWindow.ShowAsync(region.Value);
-                if (result is null) return;
+                if (result is null) { AppLogger.Log("OnNewRecording: wizard cancelled"); return; }
+                AppLogger.Log($"OnNewRecording: wizard done, fps={result.Fps} mic={result.MicEnabled} sys={result.SystemAudioEnabled}");
 
                 _recording?.Dispose();
                 _recording = new RecordingService();
                 _recording.Start(result);
+                AppLogger.Log("OnNewRecording: recording started");
 
                 SetRecordingState(true);
 
-                var overlay = new RecordingOverlay(result.Region);
-                overlay.StopRequested += async () => await StopRecordingAsync();
-                overlay.Show();
+                _recordingOverlay?.Close();
+                _recordingOverlay = new RecordingOverlay(result.Region);
+                _recordingOverlay.StopRequested += async () => await StopRecordingAsync();
+                _recordingOverlay.Show();
             }
             catch (Exception ex)
             {
+                AppLogger.LogException("OnNewRecording", ex);
                 System.Windows.MessageBox.Show($"Ошибка запуска записи:\n{ex.Message}",
                     "ScreenRecorder", MessageBoxButton.OK, MessageBoxImage.Error);
                 SetRecordingState(false);
@@ -87,15 +95,29 @@ namespace VideoRecorderScreen.Services
         public async Task StopRecordingAsync()
         {
             if (_recording?.IsRecording != true) return;
+            AppLogger.Log("StopRecordingAsync: stopping");
             SetRecordingState(false);
+
+            _recordingOverlay?.Close();
+            _recordingOverlay = null;
+
             try
             {
-                var path = await _recording.StopAsync();
-                _notifyIcon?.ShowBalloonTip(3000, "ScreenRecorder",
-                    $"Запись сохранена:\n{path}", ToolTipIcon.Info);
+                var tempPath = await _recording.StopAsync();
+                AppLogger.Log($"StopRecordingAsync: encoding done, tempPath={tempPath}");
+
+                var finalPath = await SaveService.SaveAsync(tempPath);
+                _recording.Cleanup();
+                AppLogger.Log($"StopRecordingAsync: saved to finalPath={finalPath ?? "cancelled"}");
+
+                if (finalPath != null)
+                    _notifyIcon?.ShowBalloonTip(3000, "ScreenRecorder",
+                        $"Запись сохранена:\n{finalPath}", ToolTipIcon.Info);
             }
             catch (Exception ex)
             {
+                AppLogger.LogException("StopRecordingAsync", ex);
+                _recording?.Cleanup();
                 System.Windows.MessageBox.Show($"Ошибка сохранения записи:\n{ex.Message}",
                     "ScreenRecorder", MessageBoxButton.OK, MessageBoxImage.Error);
             }
