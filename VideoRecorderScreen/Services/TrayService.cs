@@ -1,5 +1,7 @@
 using System.Drawing;
+using System.Windows;
 using System.Windows.Forms;
+using VideoRecorderScreen.Views;
 using Application = System.Windows.Application;
 
 namespace VideoRecorderScreen.Services
@@ -31,9 +33,20 @@ namespace VideoRecorderScreen.Services
             return menu;
         }
 
-        private static void OnNewRecording(object? sender, EventArgs e)
+        private static async void OnNewRecording(object? sender, EventArgs e)
         {
-            // TODO: Step 4 — open wizard
+            var s = App.SettingsService.Settings;
+            var initial = new Rect(s.RegionX, s.RegionY, s.RegionWidth, s.RegionHeight);
+
+            var region = await OverlayWindow.ShowAsync(initial);
+            if (region is null) return;
+
+            s.RegionX = (int)region.Value.X;
+            s.RegionY = (int)region.Value.Y;
+            s.RegionWidth = (int)region.Value.Width;
+            s.RegionHeight = (int)region.Value.Height;
+
+            // TODO: Step 4 — open wizard with selected region
         }
 
         private static void OnOpenFolder(object? sender, EventArgs e)
