@@ -1,0 +1,102 @@
+<Window x:Class="VideoRecorderScreen.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Настройки — ScreenRecorder"
+        Width="480" SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        ShowInTaskbar="True">
+    <Window.Resources>
+        <Style x:Key="GroupStyle" TargetType="GroupBox">
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Padding" Value="10,6,10,10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,4,8,4"/>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="16">
+
+        <!-- Files -->
+        <GroupBox Header="Файлы" Style="{StaticResource GroupStyle}">
+            <StackPanel>
+                <CheckBox x:Name="ChkAutoFormat" Content="Авто-имя файла  (Recording_YYYY-MM-DD_HH-mm.mp4)"
+                          FontWeight="Normal" Margin="0,0,0,8"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Папка записей:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox  Grid.Column="1" x:Name="TxtFolder" FontWeight="Normal" VerticalContentAlignment="Center" Height="26"/>
+                    <Button   Grid.Column="2" Content="…" Width="28" Height="26" Margin="6,0,0,0" Click="BrowseFolder_Click"/>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Recording -->
+        <GroupBox Header="Запись" Style="{StaticResource GroupStyle}">
+            <StackPanel>
+                <!-- FPS -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="FPS по умолчанию:" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox x:Name="CmbFps" Width="80" FontWeight="Normal" VerticalContentAlignment="Center" Height="26">
+                        <ComboBoxItem Tag="5">5</ComboBoxItem>
+                        <ComboBoxItem Tag="10">10</ComboBoxItem>
+                        <ComboBoxItem Tag="15">15</ComboBoxItem>
+                        <ComboBoxItem Tag="20">20</ComboBoxItem>
+                        <ComboBoxItem Tag="30">30</ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- Video quality -->
+                <TextBlock Text="Качество видео:" FontWeight="Normal" Margin="0,0,0,4"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                    <RadioButton x:Name="RbLow"    Content="Низкое (1000)"  GroupName="Quality" Margin="0,0,12,0" FontWeight="Normal" Tag="1000" Checked="Quality_Checked"/>
+                    <RadioButton x:Name="RbMedium" Content="Среднее (4000)" GroupName="Quality" Margin="0,0,12,0" FontWeight="Normal" Tag="4000" Checked="Quality_Checked"/>
+                    <RadioButton x:Name="RbHigh"   Content="Высокое (8000)" GroupName="Quality" Margin="0,0,12,0" FontWeight="Normal" Tag="8000" Checked="Quality_Checked"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Вручную (кбит/с):" Style="{StaticResource FieldLabel}"/>
+                    <TextBox x:Name="TxtBitrate" Width="90" Height="26" FontWeight="Normal"
+                             VerticalContentAlignment="Center"
+                             PreviewTextInput="Bitrate_PreviewInput"
+                             TextChanged="Bitrate_TextChanged"/>
+                    <TextBlock x:Name="BitrateError" Text="500 – 50000" Foreground="Red"
+                               Visibility="Collapsed" VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="Normal"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Control -->
+        <GroupBox Header="Управление" Style="{StaticResource GroupStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Горячая клавиша:" Style="{StaticResource FieldLabel}"/>
+                    <TextBox x:Name="TxtHotkey" Width="160" Height="26" FontWeight="Normal"
+                             VerticalContentAlignment="Center"
+                             PreviewKeyDown="Hotkey_PreviewKeyDown"
+                             GotFocus="Hotkey_GotFocus" LostFocus="Hotkey_LostFocus"/>
+                    <TextBlock x:Name="HotkeyError" Foreground="Red" Visibility="Collapsed"
+                               VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="Normal"/>
+                </StackPanel>
+                <CheckBox x:Name="ChkLaunchWithWindows" Content="Запускать вместе с Windows"
+                          FontWeight="Normal"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Buttons -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
+            <Button Content="Сохранить" Width="100" Height="28" Margin="0,0,8,0"
+                    IsDefault="True" Click="Save_Click"/>
+            <Button Content="Отмена"    Width="80"  Height="28"
+                    IsCancel="True"  Click="Cancel_Click"/>
+        </StackPanel>
+
+    </StackPanel>
+</Window>

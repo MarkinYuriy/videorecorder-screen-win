@@ -10,6 +10,7 @@ namespace VideoRecorderScreen
         public static HotkeyService HotkeyService { get; } = new();
 
         private TrayService? _trayService;
+        public TrayService? TrayService => _trayService;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -24,7 +25,7 @@ namespace VideoRecorderScreen
             _trayService.Initialize();
 
             var err = HotkeyService.Register(SettingsService.Settings.Hotkey,
-                () => _trayService.StopRecordingAsync());
+                () => { _ = _trayService.StopRecordingAsync(); });
             if (err != null)
                 AppLogger.Log($"App: hotkey registration warning: {err}");
         }

@@ -158,9 +158,7 @@ namespace VideoRecorderScreen.Services
         }
 
         private static void OnSettings(object? sender, EventArgs e)
-        {
-            // TODO: Step 11 — open settings window
-        }
+            => Views.SettingsWindow.ShowOrActivate();
 
         private void OnExit(object? sender, EventArgs e)
         {
