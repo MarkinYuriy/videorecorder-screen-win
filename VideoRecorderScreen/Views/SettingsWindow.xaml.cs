@@ -23,6 +23,7 @@ namespace VideoRecorderScreen.Views
         public SettingsWindow()
         {
             InitializeComponent();
+            LoadLanguageCombo();
             LoadSettings();
         }
 
@@ -31,6 +32,12 @@ namespace VideoRecorderScreen.Views
             var existing = Application.Current.Windows.OfType<SettingsWindow>().FirstOrDefault();
             if (existing != null) { existing.Activate(); return; }
             new SettingsWindow().Show();
+        }
+
+        private void LoadLanguageCombo()
+        {
+            foreach (var (code, name) in LocalizationService.SupportedLanguages)
+                CmbLanguage.Items.Add(new ComboBoxItem { Content = name, Tag = code });
         }
 
         private void LoadSettings()
@@ -43,28 +50,31 @@ namespace VideoRecorderScreen.Views
             _pendingHotkey = s.Hotkey;
             ChkLaunchWithWindows.IsChecked = s.LaunchWithWindows;
 
-            // FPS
             foreach (ComboBoxItem item in CmbFps.Items)
                 if ((string)item.Content == s.DefaultFps.ToString())
                     { CmbFps.SelectedItem = item; break; }
-            if (CmbFps.SelectedItem == null) CmbFps.SelectedIndex = 1; // default 10
+            if (CmbFps.SelectedItem == null) CmbFps.SelectedIndex = 1;
 
-            // Bitrate
             TxtBitrate.Text = s.VideoBitrate.ToString();
             switch (s.VideoBitrate)
             {
                 case 1000: RbLow.IsChecked    = true; break;
-                case 4000: RbMedium.IsChecked = true; break;
                 case 8000: RbHigh.IsChecked   = true; break;
-                default:   TxtBitrate.Text    = s.VideoBitrate.ToString(); break;
+                default:   RbMedium.IsChecked = true; break;
             }
+
+            var currentLang = s.Language;
+            foreach (ComboBoxItem item in CmbLanguage.Items)
+                if ((string)item.Tag == currentLang)
+                    { CmbLanguage.SelectedItem = item; break; }
+            if (CmbLanguage.SelectedItem == null) CmbLanguage.SelectedIndex = 0;
         }
 
         private void BrowseFolder_Click(object sender, RoutedEventArgs e)
         {
             using var dlg = new WinFolderDialog
             {
-                Description = "Папка для записей",
+                Description = LocalizationService.Get("Settings_Folder"),
                 SelectedPath = TxtFolder.Text
             };
             if (dlg.ShowDialog() == WinDialogResult.OK)
@@ -74,30 +84,27 @@ namespace VideoRecorderScreen.Views
         private void Quality_Checked(object sender, RoutedEventArgs e)
         {
             if (TxtBitrate == null) return;
-            var rb = (RadioButton)sender;
-            TxtBitrate.Text = rb.Tag.ToString();
+            TxtBitrate.Text = ((RadioButton)sender).Tag.ToString();
         }
 
         private void Bitrate_PreviewInput(object sender, TextCompositionEventArgs e)
-        {
-            e.Handled = !e.Text.All(char.IsDigit);
-        }
+            => e.Handled = !e.Text.All(char.IsDigit);
 
         private void Bitrate_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (BitrateError == null) return;
             bool valid = int.TryParse(TxtBitrate.Text, out int v) && v >= 500 && v <= 50000;
-            BitrateError.Visibility = valid || string.IsNullOrEmpty(TxtBitrate.Text)
-                ? Visibility.Collapsed : Visibility.Visible;
-            TxtBitrate.Background = valid || string.IsNullOrEmpty(TxtBitrate.Text)
-                ? Brushes.White : new SolidColorBrush(Color.FromRgb(0xFF, 0xDD, 0xDD));
+            bool empty = string.IsNullOrEmpty(TxtBitrate.Text);
+            BitrateError.Visibility = (valid || empty) ? Visibility.Collapsed : Visibility.Visible;
+            TxtBitrate.Background   = (valid || empty)
+                ? Brushes.White
+                : new SolidColorBrush(Color.FromRgb(0xFF, 0xDD, 0xDD));
         }
 
-        // Hotkey capture
         private void Hotkey_GotFocus(object sender, RoutedEventArgs e)
         {
             _hotkeyCapturing = true;
-            TxtHotkey.Text = "Нажмите комбинацию...";
+            TxtHotkey.Text = LocalizationService.Get("Hotkey_Prompt");
             TxtHotkey.Foreground = Brushes.Gray;
         }
 
@@ -114,11 +121,9 @@ namespace VideoRecorderScreen.Views
             e.Handled = true;
 
             var key = e.Key == Key.System ? e.SystemKey : e.Key;
-            if (key == Key.LeftCtrl || key == Key.RightCtrl ||
-                key == Key.LeftShift || key == Key.RightShift ||
-                key == Key.LeftAlt || key == Key.RightAlt ||
-                key == Key.LWin || key == Key.RWin)
-                return; // wait for a non-modifier key
+            if (key is Key.LeftCtrl or Key.RightCtrl or Key.LeftShift or Key.RightShift
+                    or Key.LeftAlt or Key.RightAlt or Key.LWin or Key.RWin)
+                return;
 
             var parts = new List<string>();
             if ((Keyboard.Modifiers & ModifierKeys.Control) != 0) parts.Add("Ctrl");
@@ -136,24 +141,31 @@ namespace VideoRecorderScreen.Views
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            // Validate bitrate
             if (!int.TryParse(TxtBitrate.Text, out int bitrate) || bitrate < 500 || bitrate > 50000)
             {
-                MessageBox.Show("Битрейт должен быть от 500 до 50000 кбит/с.",
-                    "Настройки", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(LocalizationService.Get("Error_Bitrate"),
+                    "ScreenRecorder", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             var s = App.SettingsService.Settings;
-
-            s.AutoFormatFilename  = ChkAutoFormat.IsChecked == true;
-            s.RecordingsFolder    = TxtFolder.Text.Trim();
-            s.LaunchWithWindows   = ChkLaunchWithWindows.IsChecked == true;
-            s.VideoBitrate        = bitrate;
+            s.AutoFormatFilename = ChkAutoFormat.IsChecked == true;
+            s.RecordingsFolder   = TxtFolder.Text.Trim();
+            s.LaunchWithWindows  = ChkLaunchWithWindows.IsChecked == true;
+            s.VideoBitrate       = bitrate;
 
             if (CmbFps.SelectedItem is ComboBoxItem fpsItem &&
                 int.TryParse((string)fpsItem.Content, out int fps))
                 s.DefaultFps = fps;
+
+            // Language
+            if (CmbLanguage.SelectedItem is ComboBoxItem langItem)
+            {
+                var newLang = (string)langItem.Tag;
+                if (newLang != s.Language)
+                    LocalizationService.Apply(newLang);
+                s.LanguageUserSelected = true;
+            }
 
             // Hotkey
             if (_pendingHotkey != s.Hotkey)
@@ -186,15 +198,11 @@ namespace VideoRecorderScreen.Views
                 using var key = RegKey.CurrentUser.OpenSubKey(
                     @"Software\Microsoft\Windows\CurrentVersion\Run", writable: true);
                 if (enable)
-                    key?.SetValue("ScreenRecorder",
-                        $"\"{Environment.ProcessPath}\"");
+                    key?.SetValue("ScreenRecorder", $"\"{Environment.ProcessPath}\"");
                 else
                     key?.DeleteValue("ScreenRecorder", throwOnMissingValue: false);
             }
-            catch (Exception ex)
-            {
-                AppLogger.LogException("ApplyLaunchWithWindows", ex);
-            }
+            catch (Exception ex) { AppLogger.LogException("ApplyLaunchWithWindows", ex); }
         }
     }
 }

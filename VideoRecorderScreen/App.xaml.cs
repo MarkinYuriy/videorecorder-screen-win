@@ -19,6 +19,7 @@ namespace VideoRecorderScreen
             GlobalFFOptions.Configure(o => o.BinaryFolder = AppDomain.CurrentDomain.BaseDirectory);
             SettingsService.Load();
 
+            LocalizationService.Initialize();
             HotkeyService.Initialize();
 
             _trayService = new TrayService();

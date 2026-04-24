@@ -11,7 +11,8 @@ namespace VideoRecorderScreen.Models
         public int DefaultFps { get; set; } = 10;
         public int VideoBitrate { get; set; } = 4000;
         public bool LaunchWithWindows { get; set; } = false;
-        public string Language { get; set; } = "ru";
+        public string Language { get; set; } = "";
+        public bool LanguageUserSelected { get; set; } = false;
 
         // Last selected capture region (pixels, screen coordinates)
         public int RegionX { get; set; } = 0;

@@ -25,23 +25,36 @@ namespace VideoRecorderScreen.Services
                 Visible = true,
                 ContextMenuStrip = BuildMenu()
             };
+            LocalizationService.LanguageChanged += RebuildMenu;
         }
+
+        private static string L(string key) => LocalizationService.Get(key);
 
         private ContextMenuStrip BuildMenu()
         {
-            _itemNewRecording  = new ToolStripMenuItem("Новая запись",        null, OnNewRecording);
-            _itemStopRecording = new ToolStripMenuItem("⏹  Остановить запись", null, OnStopRecording)
+            _itemNewRecording  = new ToolStripMenuItem(L("Menu_NewRecording"),  null, OnNewRecording);
+            _itemStopRecording = new ToolStripMenuItem(L("Menu_StopRecording"), null, OnStopRecording)
                 { Visible = false };
 
             var menu = new ContextMenuStrip();
             menu.Items.Add(_itemNewRecording);
             menu.Items.Add(_itemStopRecording);
-            menu.Items.Add("Открыть папку записей", null, OnOpenFolder);
+            menu.Items.Add(L("Menu_OpenFolder"), null, OnOpenFolder);
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Настройки", null, OnSettings);
+            menu.Items.Add(L("Menu_Settings"), null, OnSettings);
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Выход", null, OnExit);
+            menu.Items.Add(L("Menu_Exit"), null, OnExit);
             return menu;
+        }
+
+        private void RebuildMenu()
+        {
+            if (_notifyIcon == null) return;
+            var wasRecording = _itemStopRecording?.Visible == true;
+            var old = _notifyIcon.ContextMenuStrip;
+            _notifyIcon.ContextMenuStrip = BuildMenu();
+            old?.Dispose();
+            if (wasRecording) SetRecordingState(true);
         }
 
         private async void OnNewRecording(object? sender, EventArgs e)
@@ -83,7 +96,7 @@ namespace VideoRecorderScreen.Services
             catch (Exception ex)
             {
                 AppLogger.LogException("OnNewRecording", ex);
-                System.Windows.MessageBox.Show($"Ошибка запуска записи:\n{ex.Message}",
+                System.Windows.MessageBox.Show(string.Format(L("Error_StartFailed"), ex.Message),
                     "ScreenRecorder", MessageBoxButton.OK, MessageBoxImage.Error);
                 SetRecordingState(false);
             }
@@ -112,13 +125,13 @@ namespace VideoRecorderScreen.Services
 
                 if (finalPath != null)
                     _notifyIcon?.ShowBalloonTip(3000, "ScreenRecorder",
-                        $"Запись сохранена:\n{finalPath}", ToolTipIcon.Info);
+                        string.Format(L("Balloon_Saved"), finalPath), ToolTipIcon.Info);
             }
             catch (Exception ex)
             {
                 AppLogger.LogException("StopRecordingAsync", ex);
                 _recording?.Cleanup();
-                System.Windows.MessageBox.Show($"Ошибка сохранения записи:\n{ex.Message}",
+                System.Windows.MessageBox.Show(string.Format(L("Error_SaveFailed"), ex.Message),
                     "ScreenRecorder", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -147,7 +160,7 @@ namespace VideoRecorderScreen.Services
                 g.FillEllipse(Brushes.Red, 3, 3, 10, 10);
             }
             _notifyIcon.Icon = Icon.FromHandle(bmp.GetHicon());
-            _notifyIcon.Text = recording ? "ScreenRecorder — запись..." : "ScreenRecorder";
+            _notifyIcon.Text = recording ? L("Tray_Recording") : "ScreenRecorder";
         }
 
         private static void OnOpenFolder(object? sender, EventArgs e)

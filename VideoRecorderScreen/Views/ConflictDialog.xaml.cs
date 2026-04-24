@@ -11,7 +11,7 @@ namespace VideoRecorderScreen.Views
         private ConflictDialog(string filename)
         {
             InitializeComponent();
-            MessageText.Text = $"\"{filename}\" уже существует. Что сделать?";
+            MessageText.Text = string.Format(Services.LocalizationService.Get("Conflict_Message"), filename);
         }
 
         public static Task<ConflictChoice> ShowAsync(string filename)

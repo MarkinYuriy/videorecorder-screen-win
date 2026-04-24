@@ -34,7 +34,7 @@
                            VerticalAlignment="Center"
                            Margin="0,0,12,0"/>
                 <Button x:Name="StopBtn"
-                        Content="■  Стоп"
+                        Content="{DynamicResource StopBtn}"
                         Foreground="White"
                         Background="#AA333333"
                         BorderBrush="#666666"

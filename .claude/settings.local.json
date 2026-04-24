@@ -2,7 +2,19 @@
   "permissions": {
     "allow": [
       "Bash(dotnet build *)",
-      "Bash(git add *)"
+      "Bash(git -C /c/Users/u/source/repos/VideoRecorderScreen status)",
+      "Bash(git -C /c/Users/u/source/repos/VideoRecorderScreen remote -v)",
+      "Bash(git -C /c/Users/u/source/repos/VideoRecorderScreen status -u)",
+      "Bash(git *)",
+      "Bash(taskkill /PID 6040 /F)",
+      "Bash(dotnet add *)",
+      "Bash(grep -v \"^C:\\\\\\\\\\\\\\\\Program\")",
+      "Bash(python3 -c ' *)",
+      "Bash(node -e ' *)",
+      "Bash(node *)",
+      "Bash(/c/Users/u/source/repos/VideoRecorderScreen/VideoRecorderScreen/bin/Debug/net10.0-windows/ffprobe.exe *)",
+      "Bash(\"/c/Users/u/source/repos/VideoRecorderScreen/VideoRecorderScreen/bin/Debug/net10.0-windows/ffprobe.exe\" -v error -show_streams \"/c/Users/u/Documents/Recordings/Recording_2026-04-25_01-40.mp4\")",
+      "Bash(del *)"
     ]
   }
 }

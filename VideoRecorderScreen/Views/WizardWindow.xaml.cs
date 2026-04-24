@@ -47,12 +47,14 @@ namespace VideoRecorderScreen.Views
             Close();
         }
 
+        private static string L(string key) => Services.LocalizationService.Get(key);
+
         private void GoToStep2()
         {
             Step2Panel.Visibility = Visibility.Visible;
             Step3Panel.Visibility = Visibility.Collapsed;
             BackButton.Visibility = Visibility.Collapsed;
-            NextButton.Content = "Далее →";
+            NextButton.Content = L("Btn_Next");
             Dot1.Fill = new SolidColorBrush(Color.FromRgb(0x4F, 0xC3, 0xF7));
             Dot2.Fill = new SolidColorBrush(Color.FromRgb(0xCC, 0xCC, 0xCC));
         }
@@ -61,13 +63,13 @@ namespace VideoRecorderScreen.Views
         {
             SummaryRegion.Text = $"{(int)_region.Width} × {(int)_region.Height}  (x={((int)_region.X)}, y={((int)_region.Y)})";
             SummaryFps.Text = $"{GetFps()} fps";
-            SummaryMic.Text = MicCheck.IsChecked == true ? "Включён" : "Выключен";
-            SummaryAudio.Text = SysAudioCheck.IsChecked == true ? "Включён" : "Выключен";
+            SummaryMic.Text   = MicCheck.IsChecked    == true ? L("Value_Enabled") : L("Value_Disabled");
+            SummaryAudio.Text = SysAudioCheck.IsChecked == true ? L("Value_Enabled") : L("Value_Disabled");
 
             Step2Panel.Visibility = Visibility.Collapsed;
             Step3Panel.Visibility = Visibility.Visible;
             BackButton.Visibility = Visibility.Visible;
-            NextButton.Content = "▶  Начать запись";
+            NextButton.Content = L("Btn_Start");
             Dot2.Fill = new SolidColorBrush(Color.FromRgb(0x4F, 0xC3, 0xF7));
         }
 

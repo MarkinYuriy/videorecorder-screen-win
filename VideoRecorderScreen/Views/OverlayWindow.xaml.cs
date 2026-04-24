@@ -224,17 +224,19 @@ namespace VideoRecorderScreen.Views
         {
             HintLabel.Text = _dragMode switch
             {
-                DragMode.Draw                            => "Отпустите — зафиксировать  •  Esc — отмена",
-                DragMode.Move                            => "Отпустите — готово  •  Esc — отмена",
-                var m when m != DragMode.None            => "Отпустите — готово  •  Esc — отмена",
+                DragMode.Draw                            => L("Hint_Drawing"),
+                DragMode.Move                            => L("Hint_Release"),
+                var m when m != DragMode.None            => L("Hint_Release"),
                 _ => _hoverMode switch
                 {
-                    DragMode.Move                        => "ЛКМ — двигать  •  Enter — подтвердить  •  Esc — отмена",
-                    var m when m != DragMode.None        => "ЛКМ — изменить размер  •  Enter — подтвердить  •  Esc — отмена",
-                    _                                    => "Перетащите — выбрать область  •  Esc — отмена"
+                    DragMode.Move                        => L("Hint_Move"),
+                    var m when m != DragMode.None        => L("Hint_Resize"),
+                    _                                    => L("Hint_Draw")
                 }
             };
         }
+
+        private static string L(string key) => Services.LocalizationService.Get(key);
 
         // Handle order: NW, N, NE, E, SE, S, SW, W
         private static Point[] HandlePoints(Rect r) =>

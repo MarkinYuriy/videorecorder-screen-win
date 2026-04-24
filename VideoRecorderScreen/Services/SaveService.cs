@@ -41,8 +41,8 @@ namespace VideoRecorderScreen.Services
             {
                 var dlg = new WinSaveDialog
                 {
-                    Title = "Сохранить запись",
-                    Filter = "MP4 video|*.mp4",
+                    Title  = LocalizationService.Get("SaveDlg_Title"),
+                    Filter = LocalizationService.Get("SaveDlg_Filter"),
                     InitialDirectory = s.RecordingsFolder,
                     FileName = $"Recording_{DateTime.Now:yyyy-MM-dd_HH-mm}.mp4"
                 };
