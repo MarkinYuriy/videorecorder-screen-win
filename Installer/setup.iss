@@ -4,11 +4,12 @@
 #define AppExeName   "VideoRecorderScreen.exe"
 #define PublishX64   "..\publish\win-x64"
 #define PublishARM64 "..\publish\win-arm64"
-; Place ffmpeg builds next to this script:
-;   Installer\ffmpeg\x64\ffmpeg.exe
-;   Installer\ffmpeg\arm64\ffmpeg.exe
-#define FfmpegX64    "ffmpeg\x64\ffmpeg.exe"
-#define FfmpegARM64  "ffmpeg\arm64\ffmpeg.exe"
+; Place ffmpeg builds next to this script (all files including DLLs):
+;   Installer\ffmpeg\x64\ffmpeg.exe  + avcodec-*.dll etc.
+;   Installer\ffmpeg\arm64\ffmpeg.exe + avcodec-*.dll etc.
+; Use a shared/dynamic build from https://github.com/BtbN/FFmpeg-Builds/releases
+#define FfmpegX64    "ffmpeg\x64"
+#define FfmpegARM64  "ffmpeg\arm64"
 
 [Setup]
 AppId={{B7C4A3F2-1E9D-4F8A-BC3D-5A6E7F8B9C0D}
@@ -51,9 +52,9 @@ Source: "{#PublishX64}\*"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; \
   Check: not IsARM64
 
-Source: "{#FfmpegX64}"; \
+Source: "{#FfmpegX64}\*"; \
   DestDir: "{app}"; \
-  Flags: ignoreversion; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; \
   Check: not IsARM64
 
 ; ── ARM64 binaries ────────────────────────────────────────────
@@ -62,9 +63,9 @@ Source: "{#PublishARM64}\*"; \
   Flags: ignoreversion recursesubdirs createallsubdirs; \
   Check: IsARM64
 
-Source: "{#FfmpegARM64}"; \
+Source: "{#FfmpegARM64}\*"; \
   DestDir: "{app}"; \
-  Flags: ignoreversion; \
+  Flags: ignoreversion recursesubdirs createallsubdirs; \
   Check: IsARM64
 
 [Icons]
