@@ -3,11 +3,43 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         WindowStyle="None"
         AllowsTransparency="False"
-        Background="#CC000000"
+        Background="#1A1A1A"
         Topmost="True"
         ShowInTaskbar="False"
         Width="190" Height="38"
         ResizeMode="NoResize">
+    <Window.Resources>
+        <Style x:Key="StopStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="BorderBrush" Value="#666666"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#555555"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#222222"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Border Padding="10,5">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
             <Ellipse x:Name="RecDot" Width="9" Height="9" Fill="#FF4444"
@@ -16,15 +48,8 @@
                        FontSize="14" FontFamily="Consolas"
                        Foreground="White" VerticalAlignment="Center"
                        Margin="0,0,12,0"/>
-            <Button x:Name="StopButton"
-                    Content="{DynamicResource StopBtn}"
-                    Foreground="White"
-                    Background="#55333333"
-                    BorderBrush="#88666666"
-                    BorderThickness="1"
-                    Padding="8,2"
-                    FontSize="12"
-                    Cursor="Hand"
+            <Button Content="{DynamicResource StopBtn}"
+                    Style="{StaticResource StopStyle}"
                     Click="Stop_Click"/>
         </StackPanel>
     </Border>
