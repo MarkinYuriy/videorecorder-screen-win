@@ -6,16 +6,19 @@ namespace VideoRecorderScreen.Services
 {
     public static class LocalizationService
     {
-        public static readonly IReadOnlyList<(string Code, string Name)> SupportedLanguages =
+        public record LanguageInfo(string Code, string Name, string Flag);
+
+        public static readonly IReadOnlyList<LanguageInfo> SupportedLanguages =
         [
-            ("ru", "Русский"),
-            ("en", "English"),
-            ("de", "Deutsch"),
-            ("fr", "Français"),
-            ("es", "Español"),
-            ("it", "Italiano"),
-            ("pl", "Polski"),
-            ("pt", "Português"),
+            new("ru", "Русский",   "🇷🇺"),
+            new("en", "English",   "🇬🇧"),
+            new("de", "Deutsch",   "🇩🇪"),
+            new("fr", "Français",  "🇫🇷"),
+            new("es", "Español",   "🇪🇸"),
+            new("it", "Italiano",  "🇮🇹"),
+            new("pl", "Polski",    "🇵🇱"),
+            new("pt", "Português", "🇵🇹"),
+            new("he", "עברית",     "🇮🇱"),
         ];
 
         public static event Action? LanguageChanged;

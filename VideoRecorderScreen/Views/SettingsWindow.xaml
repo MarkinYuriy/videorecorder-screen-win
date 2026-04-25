@@ -87,8 +87,18 @@
                           FontWeight="Normal" Margin="0,0,0,8"/>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{DynamicResource Settings_Language}" Style="{StaticResource FieldLabel}"/>
-                    <ComboBox x:Name="CmbLanguage" Width="160" Height="26" FontWeight="Normal"
-                              VerticalContentAlignment="Center"/>
+                    <ComboBox x:Name="CmbLanguage" Width="200" Height="26" FontWeight="Normal"
+                              VerticalContentAlignment="Center">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Flag}" FontFamily="Segoe UI Emoji"
+                                               FontSize="15" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </StackPanel>
             </StackPanel>
         </GroupBox>

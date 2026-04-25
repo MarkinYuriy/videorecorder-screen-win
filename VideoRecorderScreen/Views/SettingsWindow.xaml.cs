@@ -36,8 +36,8 @@ namespace VideoRecorderScreen.Views
 
         private void LoadLanguageCombo()
         {
-            foreach (var (code, name) in LocalizationService.SupportedLanguages)
-                CmbLanguage.Items.Add(new ComboBoxItem { Content = name, Tag = code });
+            foreach (var lang in LocalizationService.SupportedLanguages)
+                CmbLanguage.Items.Add(lang);
         }
 
         private void LoadSettings()
@@ -64,8 +64,8 @@ namespace VideoRecorderScreen.Views
             }
 
             var currentLang = s.Language;
-            foreach (ComboBoxItem item in CmbLanguage.Items)
-                if ((string)item.Tag == currentLang)
+            foreach (LocalizationService.LanguageInfo item in CmbLanguage.Items)
+                if (item.Code == currentLang)
                     { CmbLanguage.SelectedItem = item; break; }
             if (CmbLanguage.SelectedItem == null) CmbLanguage.SelectedIndex = 0;
         }
@@ -159,11 +159,10 @@ namespace VideoRecorderScreen.Views
                 s.DefaultFps = fps;
 
             // Language
-            if (CmbLanguage.SelectedItem is ComboBoxItem langItem)
+            if (CmbLanguage.SelectedItem is LocalizationService.LanguageInfo langItem)
             {
-                var newLang = (string)langItem.Tag;
-                if (newLang != s.Language)
-                    LocalizationService.Apply(newLang);
+                if (langItem.Code != s.Language)
+                    LocalizationService.Apply(langItem.Code);
                 s.LanguageUserSelected = true;
             }
 
