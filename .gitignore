@@ -14,6 +14,10 @@ packages/
 # Publish profiles output
 publish/
 
+# Installer output
+Installer/output/
+Installer/ffmpeg/
+
 # OS
 Thumbs.db
 Desktop.ini
