@@ -11,6 +11,8 @@ namespace VideoRecorderScreen.Models
         public int DefaultFps { get; set; } = 10;
         public int VideoBitrate { get; set; } = 4000;
         public bool LaunchWithWindows { get; set; } = false;
+        public bool CaptureCursor { get; set; } = true;
+        public int CountdownSeconds { get; set; } = 3;
         public string Language { get; set; } = "";
         public bool LanguageUserSelected { get; set; } = false;
 

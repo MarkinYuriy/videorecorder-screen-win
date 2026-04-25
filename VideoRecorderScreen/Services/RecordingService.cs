@@ -35,7 +35,7 @@ namespace VideoRecorderScreen.Services
                 settings.Fps, App.SettingsService.Settings.VideoBitrate, _tempDir);
 
             _screen.FrameReady += _encoder.AddFrame;
-            _screen.Start(region, settings.Fps);
+            _screen.Start(region, settings.Fps, settings.CaptureCursor);
         }
 
         // Returns path to merged temp file (not yet at final destination)

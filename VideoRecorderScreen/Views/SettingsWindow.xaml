@@ -53,6 +53,22 @@
                     </ComboBox>
                 </StackPanel>
 
+                <CheckBox x:Name="ChkCaptureCursor" Content="{DynamicResource Settings_CaptureCursor}"
+                          FontWeight="Normal" Margin="0,0,0,8"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="{DynamicResource Settings_Countdown}" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox x:Name="CmbCountdown" Width="70" FontWeight="Normal"
+                              VerticalContentAlignment="Center" Height="26">
+                        <ComboBoxItem Tag="0">0</ComboBoxItem>
+                        <ComboBoxItem Tag="1">1</ComboBoxItem>
+                        <ComboBoxItem Tag="2">2</ComboBoxItem>
+                        <ComboBoxItem Tag="3">3</ComboBoxItem>
+                        <ComboBoxItem Tag="5">5</ComboBoxItem>
+                        <ComboBoxItem Tag="10">10</ComboBoxItem>
+                    </ComboBox>
+                    <TextBlock Text="{DynamicResource Settings_CountdownSec}"
+                               VerticalAlignment="Center" Margin="6,0,0,0" FontWeight="Normal"/>
+                </StackPanel>
                 <TextBlock Text="{DynamicResource Settings_VideoQuality}" FontWeight="Normal" Margin="0,0,0,4"/>
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                     <RadioButton x:Name="RbLow"    Content="{DynamicResource Settings_QualityLow}"    GroupName="Quality" Margin="0,0,12,0" FontWeight="Normal" Tag="1000" Checked="Quality_Checked"/>

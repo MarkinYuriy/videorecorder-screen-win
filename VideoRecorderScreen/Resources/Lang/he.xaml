@@ -21,6 +21,7 @@
     <sys:String x:Key="Wizard_Fps">FPS:</sys:String>
     <sys:String x:Key="Wizard_Mic">מיקרופון:</sys:String>
     <sys:String x:Key="Wizard_SysAudio">שמע מערכת:</sys:String>
+    <sys:String x:Key="Wizard_Cursor">סמן עכבר:</sys:String>
     <sys:String x:Key="Wizard_Step3Title">מוכן להקלטה</sys:String>
     <sys:String x:Key="Wizard_Region">אזור:</sys:String>
     <sys:String x:Key="Btn_Back">← חזרה</sys:String>
@@ -34,6 +35,10 @@
     <sys:String x:Key="Settings_AutoFormat">שם קובץ אוטומטי  (Recording_YYYY-MM-DD_HH-mm.mp4)</sys:String>
     <sys:String x:Key="Settings_Folder">תיקיית הקלטות:</sys:String>
     <sys:String x:Key="Settings_GroupRecording">הקלטה</sys:String>
+    <sys:String x:Key="Settings_CaptureCursor">הקלט את סמן העכבר</sys:String>
+    <sys:String x:Key="Settings_Countdown">ספירה לאחור:</sys:String>
+    <sys:String x:Key="Settings_CountdownSec">שנ'</sys:String>
+    <sys:String x:Key="Wizard_CountdownText">ההקלטה מתחילה בעוד...</sys:String>
     <sys:String x:Key="Settings_DefaultFps">FPS ברירת מחדל:</sys:String>
     <sys:String x:Key="Settings_VideoQuality">איכות וידאו:</sys:String>
     <sys:String x:Key="Settings_QualityLow">נמוכה (1000)</sys:String>

@@ -44,7 +44,13 @@ namespace VideoRecorderScreen.Views
         {
             var s = App.SettingsService.Settings;
 
-            ChkAutoFormat.IsChecked = s.AutoFormatFilename;
+            ChkAutoFormat.IsChecked    = s.AutoFormatFilename;
+            ChkCaptureCursor.IsChecked = s.CaptureCursor;
+
+            foreach (ComboBoxItem item in CmbCountdown.Items)
+                if (item.Tag?.ToString() == s.CountdownSeconds.ToString())
+                    { CmbCountdown.SelectedItem = item; break; }
+            if (CmbCountdown.SelectedItem == null) CmbCountdown.SelectedIndex = 3; // default 3
             TxtFolder.Text = s.RecordingsFolder;
             TxtHotkey.Text = s.Hotkey;
             _pendingHotkey = s.Hotkey;
@@ -149,7 +155,12 @@ namespace VideoRecorderScreen.Views
             }
 
             var s = App.SettingsService.Settings;
-            s.AutoFormatFilename = ChkAutoFormat.IsChecked == true;
+            s.AutoFormatFilename = ChkAutoFormat.IsChecked    == true;
+            s.CaptureCursor      = ChkCaptureCursor.IsChecked == true;
+
+            if (CmbCountdown.SelectedItem is ComboBoxItem cdItem &&
+                int.TryParse(cdItem.Tag?.ToString(), out int cd))
+                s.CountdownSeconds = cd;
             s.RecordingsFolder   = TxtFolder.Text.Trim();
             s.LaunchWithWindows  = ChkLaunchWithWindows.IsChecked == true;
             s.VideoBitrate       = bitrate;

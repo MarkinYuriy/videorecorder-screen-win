@@ -1,4 +1,6 @@
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 using VideoRecorderScreen.Models;
 using Color = System.Windows.Media.Color;
@@ -7,6 +9,10 @@ namespace VideoRecorderScreen.Views
 {
     public partial class WizardWindow : Window
     {
+        [DllImport("user32.dll")]
+        private static extern bool SetWindowDisplayAffinity(IntPtr hwnd, uint dwAffinity);
+        private const uint WDA_EXCLUDEFROMCAPTURE = 0x11;
+
         private readonly Rect _region;
         private readonly TaskCompletionSource<WizardResult?> _tcs;
 
@@ -16,10 +22,14 @@ namespace VideoRecorderScreen.Views
             _region = region;
             _tcs = tcs;
 
+            SourceInitialized += (_, _) =>
+                SetWindowDisplayAffinity(new WindowInteropHelper(this).Handle, WDA_EXCLUDEFROMCAPTURE);
+
             var s = App.SettingsService.Settings;
             SetFps(s.DefaultFps);
-            MicCheck.IsChecked = false;
+            MicCheck.IsChecked     = false;
             SysAudioCheck.IsChecked = false;
+            CursorCheck.IsChecked  = s.CaptureCursor;
 
             Closed += (_, _) => _tcs.TrySetResult(null);
         }
@@ -63,8 +73,9 @@ namespace VideoRecorderScreen.Views
         {
             SummaryRegion.Text = $"{(int)_region.Width} × {(int)_region.Height}  (x={((int)_region.X)}, y={((int)_region.Y)})";
             SummaryFps.Text = $"{GetFps()} fps";
-            SummaryMic.Text   = MicCheck.IsChecked    == true ? L("Value_Enabled") : L("Value_Disabled");
-            SummaryAudio.Text = SysAudioCheck.IsChecked == true ? L("Value_Enabled") : L("Value_Disabled");
+            SummaryMic.Text    = MicCheck.IsChecked      == true ? L("Value_Enabled") : L("Value_Disabled");
+            SummaryAudio.Text  = SysAudioCheck.IsChecked == true ? L("Value_Enabled") : L("Value_Disabled");
+            SummaryCursor.Text = CursorCheck.IsChecked   == true ? L("Value_Enabled") : L("Value_Disabled");
 
             Step2Panel.Visibility = Visibility.Collapsed;
             Step3Panel.Visibility = Visibility.Visible;
@@ -73,20 +84,41 @@ namespace VideoRecorderScreen.Views
             Dot2.Fill = new SolidColorBrush(Color.FromRgb(0x4F, 0xC3, 0xF7));
         }
 
-        private void StartRecording()
+        private async void StartRecording()
         {
             var fps = GetFps();
             var s = App.SettingsService.Settings;
             s.DefaultFps = fps;
             App.SettingsService.Save();
 
-            _tcs.TrySetResult(new WizardResult
+            var result = new WizardResult
             {
                 Region = _region,
                 Fps = fps,
                 MicEnabled = MicCheck.IsChecked == true,
-                SystemAudioEnabled = SysAudioCheck.IsChecked == true
-            });
+                SystemAudioEnabled = SysAudioCheck.IsChecked == true,
+                CaptureCursor = CursorCheck.IsChecked == true
+            };
+
+            int countdown = s.CountdownSeconds;
+            if (countdown > 0)
+            {
+                Step3Panel.Visibility  = Visibility.Collapsed;
+                CountdownPanel.Visibility = Visibility.Visible;
+                BackButton.Visibility  = Visibility.Collapsed;
+                NextButton.IsEnabled   = false;
+
+                for (int i = countdown; i > 0; i--)
+                {
+                    if (!IsVisible) return; // user closed during countdown
+                    CountdownNumber.Text = i.ToString();
+                    await Task.Delay(1000);
+                }
+            }
+
+            Hide();
+            await Task.Delay(150); // let compositor remove window before first frame
+            _tcs.TrySetResult(result);
             Close();
         }
 

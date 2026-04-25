@@ -12,7 +12,9 @@ namespace VideoRecorderScreen.Services
     {
         private NotifyIcon? _notifyIcon;
         private RecordingService? _recording;
-        private RecordingOverlay? _recordingOverlay;
+        private RecordingTimerPopup? _timerPopup;
+        private System.Windows.Threading.DispatcherTimer? _blinkTimer;
+        private bool _blinkOn;
         private ToolStripMenuItem? _itemNewRecording;
         private ToolStripMenuItem? _itemStopRecording;
 
@@ -87,11 +89,6 @@ namespace VideoRecorderScreen.Services
                 AppLogger.Log("OnNewRecording: recording started");
 
                 SetRecordingState(true);
-
-                _recordingOverlay?.Close();
-                _recordingOverlay = new RecordingOverlay(result.Region);
-                _recordingOverlay.StopRequested += async () => await StopRecordingAsync();
-                _recordingOverlay.Show();
             }
             catch (Exception ex)
             {
@@ -110,9 +107,6 @@ namespace VideoRecorderScreen.Services
             if (_recording?.IsRecording != true) return;
             AppLogger.Log("StopRecordingAsync: stopping");
             SetRecordingState(false);
-
-            _recordingOverlay?.Close();
-            _recordingOverlay = null;
 
             try
             {
@@ -140,10 +134,39 @@ namespace VideoRecorderScreen.Services
         {
             if (_itemNewRecording  != null) _itemNewRecording.Visible  = !recording;
             if (_itemStopRecording != null) _itemStopRecording.Visible = recording;
-            SetRecordingIcon(recording);
+            if (recording)
+            {
+                _blinkOn = true;
+                SetRecordingIcon(recording: true, blinkOn: true);
+
+                _timerPopup?.Close();
+                _timerPopup = new RecordingTimerPopup(DateTime.Now);
+                _timerPopup.StopRequested += async () => await StopRecordingAsync();
+                _timerPopup.Show();
+                _timerPopup.Tick(blinkOn: true);
+
+                _blinkTimer = new System.Windows.Threading.DispatcherTimer
+                    { Interval = TimeSpan.FromMilliseconds(700) };
+                _blinkTimer.Tick += (_, _) =>
+                {
+                    _blinkOn = !_blinkOn;
+                    SetRecordingIcon(recording: true, blinkOn: _blinkOn);
+                    _timerPopup?.Tick(blinkOn: _blinkOn);
+                };
+                _blinkTimer.Start();
+            }
+            else
+            {
+                _blinkTimer?.Stop();
+                _blinkTimer = null;
+                SetRecordingIcon(recording: false, blinkOn: false);
+
+                _timerPopup?.Close();
+                _timerPopup = null;
+            }
         }
 
-        private void SetRecordingIcon(bool recording)
+        private void SetRecordingIcon(bool recording, bool blinkOn)
         {
             if (_notifyIcon == null) return;
             var bmp = new Bitmap(16, 16);
@@ -151,12 +174,15 @@ namespace VideoRecorderScreen.Services
             g.Clear(Color.Transparent);
             if (recording)
             {
-                g.FillEllipse(Brushes.Red, 1, 1, 14, 14);
-                g.FillEllipse(Brushes.White, 5, 5, 6, 6);
+                var brush = blinkOn
+                    ? Brushes.Red
+                    : new SolidBrush(Color.FromArgb(60, 180, 0, 0));
+                g.FillEllipse(brush, 1, 1, 14, 14);
             }
             else
             {
-                g.FillEllipse(Brushes.DarkRed, 1, 1, 14, 14);
+                // idle: white ring + red fill — clearly visible on any taskbar
+                g.FillEllipse(Brushes.White, 1, 1, 14, 14);
                 g.FillEllipse(Brushes.Red, 3, 3, 10, 10);
             }
             _notifyIcon.Icon = Icon.FromHandle(bmp.GetHicon());
@@ -185,13 +211,15 @@ namespace VideoRecorderScreen.Services
             var bmp = new Bitmap(16, 16);
             using var g = Graphics.FromImage(bmp);
             g.Clear(Color.Transparent);
-            g.FillEllipse(Brushes.DarkRed, 1, 1, 14, 14);
+            g.FillEllipse(Brushes.White, 1, 1, 14, 14);
             g.FillEllipse(Brushes.Red, 3, 3, 10, 10);
             return Icon.FromHandle(bmp.GetHicon());
         }
 
         public void Dispose()
         {
+            _blinkTimer?.Stop();
+            _timerPopup?.Close();
             _recording?.Dispose();
             _notifyIcon?.Dispose();
         }

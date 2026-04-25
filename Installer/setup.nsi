@@ -25,7 +25,7 @@ Name            "${APP_NAME} ${APP_VER}"
 OutFile         "output\ScreenRecorder_Setup_${APP_VER}.exe"
 Unicode         True
 RequestExecutionLevel admin
-SetCompressor   /SOLID lzma
+SetCompressor   zlib
 
 InstallDir      "$PROGRAMFILES64\${APP_NAME}"
 InstallDirRegKey HKLM "${UNINST_KEY}" "InstallLocation"

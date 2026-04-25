@@ -8,5 +8,6 @@ namespace VideoRecorderScreen.Models
         public int Fps { get; init; }
         public bool MicEnabled { get; init; }
         public bool SystemAudioEnabled { get; init; }
+        public bool CaptureCursor { get; init; }
     }
 }

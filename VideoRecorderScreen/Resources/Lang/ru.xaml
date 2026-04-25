@@ -21,6 +21,7 @@
     <sys:String x:Key="Wizard_Fps">FPS:</sys:String>
     <sys:String x:Key="Wizard_Mic">Микрофон:</sys:String>
     <sys:String x:Key="Wizard_SysAudio">Системный звук:</sys:String>
+    <sys:String x:Key="Wizard_Cursor">Курсор мыши:</sys:String>
     <sys:String x:Key="Wizard_Step3Title">Готово к записи</sys:String>
     <sys:String x:Key="Wizard_Region">Область:</sys:String>
     <sys:String x:Key="Btn_Back">← Назад</sys:String>
@@ -34,6 +35,10 @@
     <sys:String x:Key="Settings_AutoFormat">Авто-имя файла  (Recording_YYYY-MM-DD_HH-mm.mp4)</sys:String>
     <sys:String x:Key="Settings_Folder">Папка записей:</sys:String>
     <sys:String x:Key="Settings_GroupRecording">Запись</sys:String>
+    <sys:String x:Key="Settings_CaptureCursor">Записывать курсор мыши</sys:String>
+    <sys:String x:Key="Settings_Countdown">Задержка перед стартом:</sys:String>
+    <sys:String x:Key="Settings_CountdownSec">сек</sys:String>
+    <sys:String x:Key="Wizard_CountdownText">Запись начнётся через...</sys:String>
     <sys:String x:Key="Settings_DefaultFps">FPS по умолчанию:</sys:String>
     <sys:String x:Key="Settings_VideoQuality">Качество видео:</sys:String>
     <sys:String x:Key="Settings_QualityLow">Низкое (1000)</sys:String>

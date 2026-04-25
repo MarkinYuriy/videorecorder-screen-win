@@ -21,6 +21,7 @@
     <sys:String x:Key="Wizard_Fps">FPS:</sys:String>
     <sys:String x:Key="Wizard_Mic">Mikrofon:</sys:String>
     <sys:String x:Key="Wizard_SysAudio">Dźwięk systemowy:</sys:String>
+    <sys:String x:Key="Wizard_Cursor">Kursor myszy:</sys:String>
     <sys:String x:Key="Wizard_Step3Title">Gotowy do nagrania</sys:String>
     <sys:String x:Key="Wizard_Region">Region:</sys:String>
     <sys:String x:Key="Btn_Back">← Wstecz</sys:String>
@@ -34,6 +35,10 @@
     <sys:String x:Key="Settings_AutoFormat">Automatyczna nazwa  (Recording_YYYY-MM-DD_HH-mm.mp4)</sys:String>
     <sys:String x:Key="Settings_Folder">Folder:</sys:String>
     <sys:String x:Key="Settings_GroupRecording">Nagranie</sys:String>
+    <sys:String x:Key="Settings_CaptureCursor">Nagrywaj kursor myszy</sys:String>
+    <sys:String x:Key="Settings_Countdown">Odliczanie przed startem:</sys:String>
+    <sys:String x:Key="Settings_CountdownSec">sek</sys:String>
+    <sys:String x:Key="Wizard_CountdownText">Nagrywanie za...</sys:String>
     <sys:String x:Key="Settings_DefaultFps">Domyślne FPS:</sys:String>
     <sys:String x:Key="Settings_VideoQuality">Jakość wideo:</sys:String>
     <sys:String x:Key="Settings_QualityLow">Niska (1000)</sys:String>
